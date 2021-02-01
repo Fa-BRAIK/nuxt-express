@@ -1,13 +1,18 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 
-const auth = (request: Request, response: Response, next: NextFunction) => {
-  const token = request.header('auth-token')
+export default (request: Request, response: Response, next: NextFunction) => {
+  console.log('Fired off ')
+
+  const token = request.header('authorization')
 
   if (!token) return response.status(401).send({ message: 'Access Denied' })
 
   try {
-    const verified = jwt.verify(token, process.env.TOKEN_SECRET || 'secret')
+    const verified = jwt.verify(
+      token.split(' ')[1],
+      process.env.TOKEN_SECRET || 'secret'
+    )
     request.user = verified
 
     next(null)

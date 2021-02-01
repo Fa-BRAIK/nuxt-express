@@ -8,6 +8,22 @@ import {
 import User from '../models/user.model'
 
 export default class AuthController {
+  public static async auth(request: Request, response: Response) {
+    try {
+      let user: any = await User.findById(request.user._id)
+
+      user.password = undefined
+      user.created_at = undefined
+      user.updated_at = undefined
+
+      console.log(user)
+
+      return response.status(200).json(user)
+    } catch (err) {
+      return response.status(400).send(err)
+    }
+  }
+
   public static async register(request: Request, response: Response) {
     const { error } = CreateUserValidator.validate(request.body)
     if (error) return response.status(400).send(error.details[0].message)
@@ -48,7 +64,7 @@ export default class AuthController {
       { _id: user._id },
       process.env.TOKEN_SECRET || 'secret'
     )
-    response.header('auth-token', token).send({ access_token: token })
+    response.header('authorization', token).send({ access_token: token })
   }
 
   public static async logout(request: Request, response: Response) {
