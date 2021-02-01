@@ -1,8 +1,7 @@
-import router, { Request, Response } from 'express'
-import Controller from '../core/controllers/Controller'
+import { Application } from 'express'
+// Importing Routes
+import AuthRouter from './auth.router'
 
-const Router = router()
-
-Router.get('/', Controller.index)
-
-export default Router
+export default (app: Application) => {
+  app.use('/auth', AuthRouter)
+}
