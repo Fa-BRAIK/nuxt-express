@@ -10,15 +10,7 @@ import User from '../models/user.model'
 export default class AuthController {
   public static async auth(request: Request, response: Response) {
     try {
-      let user: any = await User.findById(request.user._id)
-
-      user.password = undefined
-      user.created_at = undefined
-      user.updated_at = undefined
-
-      console.log(user)
-
-      return response.status(200).json(user)
+      return response.status(200).json(request.user)
     } catch (err) {
       return response.status(400).send(err)
     }

@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
+import User from '../models/user.model'
 import jwt from 'jsonwebtoken'
 
-export default (request: Request, response: Response, next: NextFunction) => {
+export default async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
   console.log('Fired off ')
 
   const token = request.header('authorization')
@@ -9,11 +14,13 @@ export default (request: Request, response: Response, next: NextFunction) => {
   if (!token) return response.status(401).send({ message: 'Access Denied' })
 
   try {
-    const verified = jwt.verify(
+    const verified: any = jwt.verify(
       token.split(' ')[1],
       process.env.TOKEN_SECRET || 'secret'
     )
-    request.user = verified
+    const user: any = await User.findById(verified._id)
+    user.password = undefined
+    request.user = user
 
     next(null)
   } catch (err) {
