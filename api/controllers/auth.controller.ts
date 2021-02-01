@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 import {
   CreateUserValidator,
   LoginValidator,
@@ -43,7 +44,11 @@ export default class AuthController {
     )
     if (!validPassword) return response.status(400).send('Wrong Credentials')
 
-    response.status(200).json({ message: 'login' })
+    const token = jwt.sign(
+      { _id: user._id },
+      process.env.TOKEN_SECRET || 'secret'
+    )
+    response.header('auth-token', token).send({ access_token: token })
   }
 
   public static async logout(request: Request, response: Response) {
