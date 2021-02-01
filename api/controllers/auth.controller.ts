@@ -56,10 +56,12 @@ export default class AuthController {
       { _id: user._id },
       process.env.TOKEN_SECRET || 'secret'
     )
-    response.header('authorization', token).send({ access_token: token })
+    return response.header('authorization', token).send({ access_token: token })
   }
 
   public static async logout(request: Request, response: Response) {
-    response.status(200).json({ message: 'logout' })
+    return response
+      .header('authorization', undefined)
+      .send({ message: 'Logged out' })
   }
 }
