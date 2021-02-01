@@ -1,8 +1,18 @@
 import { Request, Response } from 'express'
 import User from '../models/user.model'
+import { CreateUserValidator } from '../validations/user.validations'
 
 export default class AuthController {
   public static async register(request: Request, response: Response) {
+    const { error } = CreateUserValidator.validate(request.body)
+    if (error) return response.status(400).send(error.details[0].message)
+
+    const emailExist = await User.findOne({ email: request.body.email })
+
+    if (emailExist) {
+      return response.status(400).send('Email already exists')
+    }
+
     const user = new User({
       name: request.body.name,
       email: request.body.email,
@@ -10,9 +20,9 @@ export default class AuthController {
     })
 
     try {
-      response.status(201).send(await user.save())
+      return response.status(201).send(await user.save())
     } catch (err) {
-      response.status(400).send(err)
+      return response.status(400).send(err)
     }
   }
 
